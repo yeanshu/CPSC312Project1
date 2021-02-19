@@ -32,7 +32,7 @@ background = black
 
 -- | Frames per second
 fps :: Int
-fps = 60
+fps = 240
 
 -- | Main
 -- play :: Display   -- ^ Display window

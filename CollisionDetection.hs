@@ -15,8 +15,8 @@ module CollisionDetection where
       (ballX, ballY) = ballLoc game
 
       -- Player 1's paddle's center
-      recXP1 = paddlesDistance
-      recYP1 = player1 game
+      recXP1 = player1 game
+      recYP1 = paddlesY
       
 
 

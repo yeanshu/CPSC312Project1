@@ -24,8 +24,17 @@ module EventHandler where
              -> BreakoutGame  -- ^ Game updated
 
   -- For an 'r' keypress, reset the ball to the center.
-  handleKeys (EventKey (Char 'r') _ _ _) game =
-    game { ballLoc = (0, 0) }
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } =
+    game { ballLoc = (0, 0), ballVel = (40, -140) }
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } =
+    game { gameState = Playing
+    , ballLoc = (0, 100)
+    , ballVel = (40, -140)
+    , player1 = 0
+    , player1v = 0
+    , paused  = False
+    , over = False
+    }
 
   -- For an 'p' keypress, pause the game.
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =
@@ -33,7 +42,7 @@ module EventHandler where
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Paused } =
     game { gameState = Playing }
 
-  -- For an 'Up' or 'Down' keypress, move verticaly player1 paddle
+  -- For an 'Left' or 'Right' keypress, move paddle horizontally
   handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) game =
     game { player1v = -1 }
   handleKeys (EventKey (SpecialKey KeyLeft) Up _ _) game =

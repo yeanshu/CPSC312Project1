@@ -33,15 +33,20 @@ module Rendering where
   render game @ Game { gameState = Paused } =
     mkStateText orange "PAUSED" 0.5 0.5
 
+  -- Game Over
+  render game @ Game { gameState = Over} =
+    translate (-300) 0 $ scale 0.5 0.5 $ color orange $ Text "Retry? Press R"
+
   -- Playing state
   render game @ Game { gameState = Playing } =
     pictures [ball, walls, bricks,
-              mkPaddle blue (player1 game) 10]
+              mkPaddle blue (player1 game) paddlesY]
 
     where
 
       -- State text
       stateText = "Paused"
+      gameOverText = "Game Over"
 
       -- The Breakout ball.
       ball = uncurry translate (ballLoc game) $ color ballColor $ circleSolid ballRadius
@@ -64,11 +69,12 @@ module Rendering where
       wallColor = greyN 0.5
       walls = pictures [wall 500, wall (-500), walltop 500, walltop (-500)]
 
-      brick :: Float -> Picture
-      brick offset =
-        translate 0 offset $
+      brick :: Float -> Float -> Picture
+      brick offset offset2=
+        translate offset offset2 $
           color brickColor $
-            rectangleSolid 100 50
+            rectangleSolid 75 25
 
       brickColor = aquamarine
-      bricks = pictures [brick 150, brick 250]
+      bricks = pictures [brick (x*100) (100 + (y*50)) |  x <- [-3..3], y <- [1..4]]
+

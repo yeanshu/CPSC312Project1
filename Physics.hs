@@ -49,7 +49,9 @@ module Physics where
 
   -- Moving the ball.
   moveBall seconds game =
-    game { ballLoc = (x' , y') }
+    if y' < (-250)
+        then game { gameState = Over }
+    else game { ballLoc = (x' , y') }
     where
       -- Old locations and velocities
       (x, y) = ballLoc game
@@ -99,3 +101,18 @@ module Physics where
                   -- Do nothing.Return te old velocity
                   vy
         vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx
+        
+        
+    -- Check if ball collides with a wall. If true, update ball velocity to bounce off
+    -- and remove the brick
+  brickBounce :: BreakoutGame -> BreakoutGame
+  brickBounce game = game -- stub
+--   brickBounce game = game {ballVel = (vx, vy')}
+--     where
+--         (vx, vy) = ballVel game
+--         vy' = if brickCollision (ballLoc game) ballRadius
+--               then
+--                   (-vy)
+--                   -- somehow remove the brick
+--                   else vy
+    
