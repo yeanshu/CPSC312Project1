@@ -24,11 +24,11 @@ module GameBoard where
     Playing | Paused
     deriving Show
 
-  -- | A data structure to hold the state of the Pong game.
-  data PongGame = Game
+  -- | A data structure to hold the state of the Breakout game.
+  data BreakoutGame = Game
     { gameState :: GameState
-    , ballLoc :: (Float, Float) -- ^ Pong ball (x, y) location.
-    , ballVel :: (Float, Float) -- ^ Pong ball (x, y) velocity.
+    , ballLoc :: (Float, Float) -- ^ Breakout ball (x, y) location.
+    , ballVel :: (Float, Float) -- ^ Breakout ball (x, y) velocity.
     , player1 :: Float          -- ^ Left player paddle height.
                                 -- Zero is the middle of the screen.
     , player1v :: Float   -- ^ player1's paddle's velocity.
@@ -36,7 +36,7 @@ module GameBoard where
     } deriving Show
 
   -- | Initialize the game with this game state.
-  initialState :: PongGame
+  initialState :: BreakoutGame
   initialState = Game
     { gameState = Playing
     , ballLoc = (0, 0)

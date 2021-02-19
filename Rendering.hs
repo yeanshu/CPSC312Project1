@@ -22,11 +22,11 @@ module Rendering where
     ]
 
   -- | Render game in IO
-  renderIO :: (PongGame -> IO Picture)
+  renderIO :: (BreakoutGame -> IO Picture)
   renderIO game = return $ render game
 
-  -- | Draw a pong game state (convert it to a picture).
-  render :: PongGame  -- ^ The game state to render
+  -- | Draw a Breakout game state (convert it to a picture).
+  render :: BreakoutGame  -- ^ The game state to render
          -> Picture   -- ^ A picture of this game state
 
   -- Paused state
@@ -43,7 +43,7 @@ module Rendering where
       -- State text
       stateText = "Paused"
 
-      -- The pong ball.
+      -- The Breakout ball.
       ball = uncurry translate (ballLoc game) $ color ballColor $ circleSolid ballRadius
       ballColor = dark red
 
@@ -54,6 +54,7 @@ module Rendering where
           color wallColor $
             rectangleSolid 10 1000
 
+      -- Left/Right walls
       walltop :: Float -> Picture
       walltop offset = 
         translate 0 offset $

@@ -9,7 +9,7 @@ module EventHandler where
   import System.Exit
 
   -- | Respond to key events in IO.
-  handleKeysIO :: (Event -> PongGame -> IO PongGame) -- ^ handleKeys function in IO
+  handleKeysIO :: (Event -> BreakoutGame -> IO BreakoutGame) -- ^ handleKeys function in IO
 
   -- For an 'q' keypress, exit the game
   handleKeysIO (EventKey (Char 'q') Up _ _) game = exitSuccess
@@ -20,8 +20,8 @@ module EventHandler where
 
   -- | Pure responding to key events.
   handleKeys :: Event     -- ^ keyEvent
-             -> PongGame  -- ^ Initial game state
-             -> PongGame  -- ^ Game updated
+             -> BreakoutGame  -- ^ Initial game state
+             -> BreakoutGame  -- ^ Game updated
 
   -- For an 'r' keypress, reset the ball to the center.
   handleKeys (EventKey (Char 'r') _ _ _) game =

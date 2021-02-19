@@ -3,7 +3,7 @@ module CollisionDetection where
   import GameBoard
 
   -- | Given position and radius of the ball, return whether a collision occurred on a player
-  paddleCollision :: PongGame -- ^ The game
+  paddleCollision :: BreakoutGame -- ^ The game
                   -> Bool     -- ^ Collision with the paddles?
 
   paddleCollision game =

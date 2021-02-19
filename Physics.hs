@@ -9,8 +9,8 @@ module Physics where
 
 
   -- | Move both paddles depending on the velocity
-  movePaddles :: PongGame -- ^ Initial game state
-              -> PongGame -- ^ new game with updated paddle position
+  movePaddles :: BreakoutGame -- ^ Initial game state
+              -> BreakoutGame -- ^ new game with updated paddle position
   movePaddles game = game { player1 = movePaddle paddleStep (player1v game) (player1 game)
                           }
 
@@ -40,8 +40,8 @@ module Physics where
 
   -- | Update the ball position using its current velocity.
   moveBall :: Float     -- ^ The number of seconds since last Update
-           -> PongGame  -- ^ The initial game state
-           -> PongGame  -- ^ A new game state with an updated ball position
+           -> BreakoutGame  -- ^ The initial game state
+           -> BreakoutGame  -- ^ A new game state with an updated ball position
 
 
   -- When paused, don't move.
@@ -62,8 +62,8 @@ module Physics where
 
   -- | Detect a collision with a paddle. Upon collisions,
   -- change the velocity of the ball to bounce it off the paddle.
-  paddleBounce :: PongGame  -- ^ The initial game state
-               -> PongGame  -- ^ A new game state with an updated ball velocity
+  paddleBounce :: BreakoutGame  -- ^ The initial game state
+               -> BreakoutGame  -- ^ A new game state with an updated ball velocity
 
   paddleBounce game = game { ballVel = (vx, vy') }
     where
@@ -80,8 +80,8 @@ module Physics where
 
   -- | Detect a collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
-  wallBounce :: PongGame  -- ^ The initial game state
-             -> PongGame  -- ^ A new game state with an updated ball velocity
+  wallBounce :: BreakoutGame  -- ^ The initial game state
+             -> BreakoutGame  -- ^ A new game state with an updated ball velocity
 
   wallBounce game = game { ballVel = (vx', vy') }
     where
