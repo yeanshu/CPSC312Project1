@@ -2,7 +2,7 @@ module GameBoard where
 
   paddleWidth, paddleHeight, paddleBorder, paddlesDistance, paddleStep, ballRadius, brickwidth, brickheight  :: Float
   paddleWidth = 86
-  paddleHeight = 26
+  paddleHeight = 25
   paddleBorder = 1
   paddlesDistance = 0
   paddleStep = 5

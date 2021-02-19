@@ -35,7 +35,7 @@ module Rendering where
 
   -- Playing state
   render game @ Game { gameState = Playing } =
-    pictures [ball, walls,
+    pictures [ball, walls, bricks,
               mkPaddle blue (player1 game) 10]
 
     where
@@ -63,3 +63,12 @@ module Rendering where
 
       wallColor = greyN 0.5
       walls = pictures [wall 500, wall (-500), walltop 500, walltop (-500)]
+
+      brick :: Float -> Picture
+      brick offset =
+        translate 0 offset $
+          color brickColor $
+            rectangleSolid 100 50
+
+      brickColor = aquamarine
+      bricks = pictures [brick 150, brick 250]
