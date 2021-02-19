@@ -65,32 +65,32 @@ module Physics where
   paddleBounce :: PongGame  -- ^ The initial game state
                -> PongGame  -- ^ A new game state with an updated ball velocity
 
-  paddleBounce game = game { ballVel = (vx', vy) }
+  paddleBounce game = game { ballVel = (vx, vy') }
     where
         (vx, vy) = ballVel game
 
-        vx' = if paddleCollision game
+        vy' = if paddleCollision game
               then
                   -- Update the velocity
-                  (-vx)
+                  (-vy)
 
                   else
                   -- Do nothing.Return te old velocity
-                  vx
+                  vy
 
   -- | Detect a collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
   wallBounce :: PongGame  -- ^ The initial game state
              -> PongGame  -- ^ A new game state with an updated ball velocity
 
-  wallBounce game = game { ballVel = (vx, vy') }
+  wallBounce game = game { ballVel = (vx', vy') }
     where
         -- Radius. Use the same thing as in `render`.
 
         -- The old Velocities.
         (vx, vy) = ballVel game
 
-        vy' = if wallCollision (ballLoc game) ballRadius
+        vy' = if wallCollisionTB (ballLoc game) ballRadius
               then
                   -- Update the velocity
                   (-vy)
@@ -98,3 +98,4 @@ module Physics where
                   else
                   -- Do nothing.Return te old velocity
                   vy
+        vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx

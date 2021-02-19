@@ -6,7 +6,7 @@ module Rendering where
 
   import Graphics.Gloss
 
-  paddleColor = black
+  paddleColor = blue
 
 
   --Make stateText
@@ -36,8 +36,7 @@ module Rendering where
   -- Playing state
   render game @ Game { gameState = Playing } =
     pictures [ball, walls,
-              mkPaddle blue paddlesDistance $ player1 game,
-              mkPaddle orange (-paddlesDistance) $ player2 game]
+              mkPaddle blue (player1 game) 10]
 
     where
 
@@ -51,9 +50,15 @@ module Rendering where
       -- The bottom and top walls
       wall :: Float -> Picture
       wall offset =
+        translate offset 0 $
+          color wallColor $
+            rectangleSolid 10 1000
+
+      walltop :: Float -> Picture
+      walltop offset = 
         translate 0 offset $
           color wallColor $
-            rectangleSolid 270 10
+            rectangleSolid 1000 10
 
       wallColor = greyN 0.5
-      walls = pictures [wall 150, wall (-150)]
+      walls = pictures [wall 500, wall (-500), walltop 500, walltop (-500)]
