@@ -26,15 +26,8 @@ module EventHandler where
   -- For an 'r' keypress, reset the ball to the center.
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } =
     game { ballLoc = (0, 0), ballVel = (40, -140) }
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } =
-    game { gameState = Playing
-    , ballLoc = (0, 100)
-    , ballVel = (40, -140)
-    , player1 = 0
-    , player1v = 0
-    , paused  = False
-    , over = False
-    }
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = initialState
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } = initialState
 
   -- For an 'p' keypress, pause the game.
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =

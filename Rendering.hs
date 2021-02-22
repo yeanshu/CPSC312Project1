@@ -21,6 +21,15 @@ module Rendering where
           (paddleWidth - paddleBorder) (paddleHeight - paddleBorder)
     ]
 
+  mkvictorytext :: Color -> Float -> Float -> Float -> Float -> Picture
+  mkvictorytext col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Congratulations!"
+
+  mkvictorytext2 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mkvictorytext2 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "You win!"
+
+  mkvictorytext3 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mkvictorytext3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press R to replay"
+
   -- | Render game in IO
   renderIO :: (BreakoutGame -> IO Picture)
   renderIO game = return $ render game
@@ -37,17 +46,18 @@ module Rendering where
   render game @ Game { gameState = Over} =
     translate (-300) 0 $ scale 0.5 0.5 $ color orange $ Text "Retry? Press R"
 
+  -- Game state win
+  render game @ Game { gameState = Winner}  = pictures [ 
+    mkvictorytext orange (-200) 200 0.5 0.5
+    ,mkvictorytext2 orange (-100) 100 0.5 0.5
+    ,mkvictorytext3 orange (-250) 0 0.5 0.5] 
+
   -- Playing state
   render game @ Game { gameState = Playing } =
     pictures [ball, walls, bricks,
-              mkPaddle blue (player1 game) paddlesY]
+              mkPaddle blue (player1 game) (-200)]
 
     where
-
-      -- State text
-      stateText = "Paused"
-      gameOverText = "Game Over"
-
       -- The Breakout ball.
       ball = uncurry translate (ballLoc game) $ color ballColor $ circleSolid ballRadius
       ballColor = dark red
@@ -73,8 +83,8 @@ module Rendering where
       brick offset offset2=
         translate offset offset2 $
           color brickColor $
-            rectangleSolid 75 25
+            rectangleSolid brickwidth brickheight
 
       brickColor = aquamarine
-      bricks = pictures [brick (x*100) (100 + (y*50)) |  x <- [-3..3], y <- [1..4]]
+      bricks = pictures [brick (fst x) (snd x) | x <- brickloc game]
 

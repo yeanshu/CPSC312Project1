@@ -1,14 +1,14 @@
 module GameBoard where
 
-  paddleWidth, paddleHeight, paddleBorder, paddlesY, paddleStep, ballRadius, brickwidth, brickheight  :: Float
+  paddleWidth, paddleHeight, paddleBorder, paddlesDistance, paddleStep, ballRadius, brickwidth, brickheight  :: Float
   paddleWidth = 86
   paddleHeight = 25
   paddleBorder = 1
-  paddlesY = (-200)
+  paddlesDistance = 0
   paddleStep = 5
   ballRadius = 10
-  brickheight = 25
   brickwidth = 75
+  brickheight = 25
 
   width, height, offset:: Int
   width = 1000
@@ -21,7 +21,7 @@ module GameBoard where
 
   -- | The game state
   data GameState =
-    Playing | Paused | Over
+    Playing | Paused | Over | Winner
     deriving Show
 
   -- | A data structure to hold the state of the Breakout game.
@@ -29,23 +29,24 @@ module GameBoard where
     { gameState :: GameState
     , ballLoc :: (Float, Float) -- ^ Breakout ball (x, y) location.
     , ballVel :: (Float, Float) -- ^ Breakout ball (x, y) velocity.
-    , player1 :: Float          -- ^ Left player paddle height.
+    , player1 :: Float          -- ^ Paddle x location
                                 -- Zero is the middle of the screen.
     , player1v :: Float   -- ^ player1's paddle's velocity.
     , paused :: Bool            -- ^ if the game is paused
-    , over :: Bool            -- ^ If the game is over
-    , brickloc :: [(Float, Float)] -- List of Brick Locations
+    , bricks :: [Bool]      -- 
+    , brickloc :: [(Float, Float)] -- list of brick locations
+
     } deriving Show
 
   -- | Initialize the game with this game state.
   initialState :: BreakoutGame
   initialState = Game
     { gameState = Playing
-    , ballLoc = (0, 100)
-    , ballVel = (40, -140)
+    , ballLoc = (-100, -100)
+    , ballVel = (40, 200)
     , player1 = 0
     , player1v = 0
     , paused  = False
-    , over = False
-    , brickloc = [(x*100, 100 + (y*50)) |  x <- [-3..3], y <- [1..4]]
+    , bricks = [True | x <- [-3..3], y <- [1..4]]
+    , brickloc = [(100*x, 100+50*y) | x <- [-3..3], y <- [1..4]]
     }

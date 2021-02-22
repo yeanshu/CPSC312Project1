@@ -20,7 +20,7 @@ update :: Float     -- ^ The number of seconds since last update
        -> BreakoutGame  -- ^ The intial game state
        -> BreakoutGame  -- ^ A new game state with an updated ball and paddles positions.
 update seconds =
-  movePaddles . wallBounce . brickBounce. paddleBounce . moveBall seconds
+  movePaddles . wallBounce . paddleBounce . brickBounce . moveBall seconds
 
 -- | Window
 window :: Display

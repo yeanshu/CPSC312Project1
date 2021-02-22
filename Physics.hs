@@ -49,7 +49,7 @@ module Physics where
 
   -- Moving the ball.
   moveBall seconds game =
-    if y' < (-250)
+    if y' < (-300)
         then game { gameState = Over }
     else game { ballLoc = (x' , y') }
     where
@@ -67,18 +67,37 @@ module Physics where
   paddleBounce :: BreakoutGame  -- ^ The initial game state
                -> BreakoutGame  -- ^ A new game state with an updated ball velocity
 
-  paddleBounce game = game { ballVel = (vx, vy') }
+  paddleBounce game = 
+    game { ballVel = (vx', vy') }
     where
+        pv = player1v game
+        px = player1 game
         (vx, vy) = ballVel game
+        (x, y) = ballLoc game
+        (nx, ny) = if x-px > paddleWidth/3
+                  then (0.8, 0.6)
+                  else if x-px < -paddleWidth/3
+                  then (-0.8, 0.6)--(-0.8, 0.6)
+                  else (0, 1)
+        vx' = if paddleCollision game && vy < 0
+              then
+                vx - 2*((x-pv)*nx + y*ny)*nx
+                else
+                vx
 
-        vy' = if paddleCollision game
+        vy' = if paddleCollision game && vy < 0
               then
                   -- Update the velocity
-                  (-vy)
-
+                  vy - 2*((x-pv)*nx + y*ny)*ny
                   else
                   -- Do nothing.Return te old velocity
                   vy
+
+        -- vx' = if paddleCollision game && pv /= 0
+        --       then
+        --         (vx'*1.1)
+        --         else
+        --         vx'
 
   -- | Detect a collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
@@ -101,21 +120,38 @@ module Physics where
                   -- Do nothing.Return te old velocity
                   vy
         vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx
-        
-        
-    -- Check if ball collides with a wall. If true, update ball velocity to bounce off
-    -- and remove the brick
-  brickBounce :: BreakoutGame -> BreakoutGame
-  brickBounce game = game { ballVel = (vx', vy') }
-    where 
-      (vx, vy) = ballVel game
 
-      vy' = if brickCollision (ballLoc game) ballRadius
-            then
-                -- Update the velocity
-                (-vy)
-                -- -vy
-                else
-                -- Do nothing.Return te old velocity
-                vy
-      vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx
+  -- Check if ball collides with a wall. If true, update ball velocity to bounce off
+  -- and remove the brick by updating relevant brick data (calls helper fn)
+  brickBounce :: BreakoutGame -> BreakoutGame
+  brickBounce game = gameUpdated
+    where
+        pair = brickCollision game -- (Bool, [Bool])
+        gameUpdated = if fst pair then brickBounceTrue game (snd pair) else game
+
+  -- Helper function for brickBounce
+  brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
+  brickBounceTrue game lst = if (all not lst1) 
+    then game { gameState = Winner } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2}
+    where
+      (vx, vy) = ballVel game
+      (ballX, ballY) = ballLoc game
+      -- update velocity
+      vy' = (-vy)
+      -- call helper to find index where brick was collided
+      brickListIndex = getTrueIndex 0 lst
+      -- update bricks
+      splitlst1 = splitAt brickListIndex $ bricks game
+      splitlst1snd = snd splitlst1
+      lst1 = fst splitlst1 ++ [False] ++ drop 1 splitlst1snd
+      -- update bricksloc
+      splitlst2 = splitAt brickListIndex $ brickloc game
+      splitlst2snd = snd splitlst2
+      lst2 = fst splitlst2 ++ [(-100000,-100000)] ++ drop 1 splitlst2snd -- used -100000 as "equivalent" to INT_MIN in C
+    
+  -- Helper function for brickBounceTrue to find index where brick was collided
+  -- Iterate until reached True then return i  
+  getTrueIndex:: Int -> [Bool] -> Int
+  getTrueIndex i lst
+    | lst!!i == False = getTrueIndex (i+1) lst
+    | otherwise = i
