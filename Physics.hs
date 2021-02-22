@@ -106,13 +106,16 @@ module Physics where
     -- Check if ball collides with a wall. If true, update ball velocity to bounce off
     -- and remove the brick
   brickBounce :: BreakoutGame -> BreakoutGame
-  brickBounce game = game -- stub
---   brickBounce game = game {ballVel = (vx, vy')}
---     where
---         (vx, vy) = ballVel game
---         vy' = if brickCollision (ballLoc game) ballRadius
---               then
---                   (-vy)
---                   -- somehow remove the brick
---                   else vy
-    
+  brickBounce game = game { ballVel = (vx', vy') }
+    where 
+      (vx, vy) = ballVel game
+
+      vy' = if brickCollision (ballLoc game) ballRadius
+            then
+                -- Update the velocity
+                (-vy)
+                -- -vy
+                else
+                -- Do nothing.Return te old velocity
+                vy
+      vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx

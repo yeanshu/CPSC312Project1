@@ -7,8 +7,8 @@ module GameBoard where
   paddlesY = (-200)
   paddleStep = 5
   ballRadius = 10
-  brickheight = 10
-  brickwidth = 50
+  brickheight = 25
+  brickwidth = 75
 
   width, height, offset:: Int
   width = 1000
@@ -34,6 +34,7 @@ module GameBoard where
     , player1v :: Float   -- ^ player1's paddle's velocity.
     , paused :: Bool            -- ^ if the game is paused
     , over :: Bool            -- ^ If the game is over
+    , brickloc :: [(Float, Float)] -- List of Brick Locations
     } deriving Show
 
   -- | Initialize the game with this game state.
@@ -46,4 +47,5 @@ module GameBoard where
     , player1v = 0
     , paused  = False
     , over = False
+    , brickloc = [(x*100, 100 + (y*50)) |  x <- [-3..3], y <- [1..4]]
     }
