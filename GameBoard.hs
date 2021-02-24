@@ -35,7 +35,8 @@ module GameBoard where
     , paused :: Bool            -- ^ if the game is paused
     , bricks :: [Bool]      -- list of bricks (if not broken, then true; else if broken, then false)
     , brickloc :: [(Float, Float)] -- list of brick locations
-
+    , score :: Int            -- Current Score
+    , speed :: Float          -- Speed of ball
     } deriving Show
 
   -- | Initialize the game with this game state.
@@ -49,4 +50,6 @@ module GameBoard where
     , paused  = True
     , bricks = [True | x <- [-3..3], y <- [1..5]]
     , brickloc = [(100*x, 100+50*y) | x <- [-3..3], y <- [1..5]]
+    , score = 0
+    , speed = 250
     }

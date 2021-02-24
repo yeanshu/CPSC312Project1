@@ -8,6 +8,9 @@ module Rendering where
 
   paddleColor = blue
 
+  data Library = Library
+    { bgImg :: Picture
+    }
 
   --Make stateText
   mkStateText :: Color -> String -> Float -> Float -> Picture
@@ -40,39 +43,42 @@ module Rendering where
 
   mktitle3 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktitle3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press x to play"
+
+  type Archive = (BreakoutGame, Picture)
   
   -- | Render game in IO
-  renderIO :: (BreakoutGame -> IO Picture)
-  renderIO game = return $ render game
+  renderIO :: (Archive -> IO Picture)
+  renderIO (game, bg) = return $ render game bg
 
   -- | Draw a Breakout game state (convert it to a picture).
   render :: BreakoutGame  -- ^ The game state to render
+         -> Picture   -- Background image
          -> Picture   -- ^ A picture of this game state
 
   -- Title Screen
-  render game @ Game { gameState = Title} = pictures [
+  render game @ Game { gameState = Title} bg = pictures [
     mktitle1 white (-375) 300 1.2 1.5
     ,mktitle2 white (-260) 150 0.3 0.3
     ,mktitle3 white (-250) (-400) 0.5 0.5]
 
   -- Paused state
-  render game @ Game { gameState = Paused } =
+  render game @ Game { gameState = Paused } bg =
     mkStateText orange "PAUSED" 0.5 0.5
 
   -- Game Over
-  render game @ Game { gameState = Over} =
+  render game @ Game { gameState = Over} bg =
     translate (-400) 0 $ scale 0.5 0.5 $ color orange $ Text "Retry? Press R"
 
   -- Game state win
-  render game @ Game { gameState = Winner}  = pictures [ 
+  render game @ Game { gameState = Winner} bg = pictures [ 
     mkvictorytext orange (-450) 200 1.0 1.0
     ,mkvictorytext2 orange (-150) 50 0.5 0.5
     ,mkvictorytext3 orange (-300) (-300) 0.5 0.5] 
 
   -- Playing state
-  render game @ Game { gameState = Playing } =
-    pictures [ball, walls, bricks,
-              mkPaddle blue (player1 game) (-200)]
+  render game @ Game { gameState = Playing } bg=
+    pictures [bg, ball, walls, bricks,
+              mkPaddle blue (player1 game) (-200), scoreRender (score game)]
 
     where
       -- The Breakout ball.
@@ -105,4 +111,5 @@ module Rendering where
       brickColor = aquamarine
       bricks = pictures [brick (fst x) (snd x) | x <- brickloc game]
 
-
+      scoreRender :: Int -> Picture
+      scoreRender score = translate 510 450 $ scale 0.15 0.15 $ color orange $ Text ("Score: " ++ (show score))

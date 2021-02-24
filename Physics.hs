@@ -7,6 +7,13 @@ module Physics where
 
   import Data.Maybe
 
+  -- Normlizes a tuple/vector then multiplies by factor
+  normalize :: Float -> Float -> Float -> (Float, Float)
+  normalize x y f = (nx, ny)
+    where
+      norm = sqrt ( x^2 + y^2 )
+      nx = x / norm * f
+      ny = y / norm * f
 
   -- | Move both paddles depending on the velocity
   movePaddles :: BreakoutGame -- ^ Initial game state
@@ -56,10 +63,10 @@ module Physics where
       -- Old locations and velocities
       (x, y) = ballLoc game
       (vx, vy) = ballVel game
-
+      (nvx, nvy) = normalize vx vy $ speed game
       --New locations
-      x' = x + vx * seconds
-      y' = y + vy * seconds
+      x' = x + nvx * seconds
+      y' = y + nvy * seconds
 
 
   -- | Detect a collision with a paddle. Upon collisions,
@@ -74,11 +81,9 @@ module Physics where
         px = player1 game
         (vx, vy) = ballVel game
         (x, y) = ballLoc game
-        (nx, ny) = if x-px > paddleWidth/3
-                  then (0.8, 0.6)
-                  else if x-px < -paddleWidth/3
-                  then (-0.8, 0.6)--(-0.8, 0.6)
-                  else (0, 1)
+        nx = (x-px)/40
+        ny = 1 - (nx^2)
+        curSpeed = speed game
         vx' = if paddleCollision game && vy < 0
               then
                 vx - 2*((x-pv)*nx + y*ny)*nx
@@ -92,12 +97,10 @@ module Physics where
                   else
                   -- Do nothing.Return te old velocity
                   vy
+        newSpeed = if pv /= 0
+                   then curSpeed + 10
+                   else curSpeed
 
-        -- vx' = if paddleCollision game && pv /= 0
-        --       then
-        --         (vx'*1.1)
-        --         else
-        --         vx'
 
   -- | Detect a collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
@@ -132,7 +135,7 @@ module Physics where
   -- Helper function for brickBounce
   brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
   brickBounceTrue game lst = if (all not lst1) 
-    then game { gameState = Winner } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2}
+    then game { gameState = Winner } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
     where
       (vx, vy) = ballVel game
       (ballX, ballY) = ballLoc game
@@ -148,6 +151,7 @@ module Physics where
       splitlst2 = splitAt brickListIndex $ brickloc game
       splitlst2snd = snd splitlst2
       lst2 = fst splitlst2 ++ [(-100000,-100000)] ++ drop 1 splitlst2snd -- used -100000 as "equivalent" to INT_MIN in C
+      curScore = score game
     
   -- Helper function for brickBounceTrue to find index where brick was collided
   -- Iterate until reached True then return i  

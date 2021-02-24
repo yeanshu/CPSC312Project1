@@ -8,6 +8,13 @@ module EventHandler where
   import Graphics.Gloss.Interface.Pure.Game
   import System.Exit
 
+  type Archive = (BreakoutGame,Picture)
+
+  handleKeysAIO :: Event -> Archive -> IO Archive
+  handleKeysAIO e w@(g, p) = do 
+    game <- handleKeysIO e (fst w)
+    return (game, p)
+
   -- | Respond to key events in IO.
   handleKeysIO :: (Event -> BreakoutGame -> IO BreakoutGame) -- ^ handleKeys function in IO
 

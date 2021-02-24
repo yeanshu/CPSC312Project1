@@ -12,6 +12,12 @@ import           Graphics.Gloss.Interface.IO.Game
 import           Debug.Trace
 
 -- | Update the game in IO
+type Archive = (BreakoutGame, Picture)
+updateAIO :: Float -> Main.Archive -> IO Main.Archive
+updateAIO s w@(g, p) = do
+  game <- updateIO s (fst w)
+  return (game, p)
+
 updateIO :: (Float -> BreakoutGame -> IO BreakoutGame)
 updateIO s game = return $ update s game
 
@@ -44,4 +50,6 @@ fps = 60
 --      -> (Float -> BreakoutGame -> BreakoutGame) -- ^ Update Game
 
 main :: IO ()
-main = playIO window background fps initialState renderIO handleKeysIO updateIO
+main = do
+  bg <- loadBMP "bg.bmp"
+  playIO window background fps (initialState, bg) renderIO handleKeysAIO updateAIO
