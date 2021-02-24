@@ -81,21 +81,21 @@ module Physics where
         px = player1 game
         (vx, vy) = ballVel game
         (x, y) = ballLoc game
-        nx = (x-px)/40
+        nx = (x-px)/50
         ny = 1 - (nx^2)
         curSpeed = speed game
-        vx' = if paddleCollision game && vy < 0
+        vx' = if paddleCollision game -- && vy < 0
               then
                 vx - 2*((x-pv)*nx + y*ny)*nx
                 else
                 vx
 
-        vy' = if paddleCollision game && vy < 0
+        vy' = if paddleCollision game -- && vy < 0
               then
                   -- Update the velocity
                   vy - 2*((x-pv)*nx + y*ny)*ny
                   else
-                  -- Do nothing.Return te old velocity
+                  -- Do nothing.Return the old velocity
                   vy
         newSpeed = if pv /= 0
                    then curSpeed + 10

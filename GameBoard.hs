@@ -51,5 +51,5 @@ module GameBoard where
     , bricks = [True | x <- [-3..3], y <- [1..5]]
     , brickloc = [(100*x, 100+50*y) | x <- [-3..3], y <- [1..5]]
     , score = 0
-    , speed = 250
+    , speed = 200
     }

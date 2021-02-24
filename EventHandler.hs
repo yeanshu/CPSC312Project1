@@ -7,6 +7,7 @@ module EventHandler where
 
   import Graphics.Gloss.Interface.Pure.Game
   import System.Exit
+  import System.Random
 
   type Archive = (BreakoutGame,Picture)
 
@@ -33,6 +34,37 @@ module EventHandler where
   -- For an 'x' keypress on title screen, play level
   handleKeys (EventKey (Char 'x') _ _ _) game@ Game { gameState = Title } = 
     game { gameState = Playing, paused = False}
+
+  -- Easy Difficulty
+  handleKeys (EventKey (Char 'z') _ _ _) game@ Game { gameState = Title } = 
+    game { 
+      gameState = Playing
+    , paused = False
+    , bricks = [True | x <- [-3,1,3], y <- [1,3,5]]
+    , brickloc = [(100*x, 100+50*y) | x <- [-3,0,3], y <- [1,3,5]]
+    , speed = 150}
+
+  -- Hard Difficulty
+  handleKeys (EventKey (Char 'c') _ _ _) game@ Game { gameState = Title } = 
+    game { 
+      gameState = Playing
+    , paused = False
+    , bricks = [True | x <- [-4..4], y <- [1..6]]
+    , brickloc = [(100*x, 100+50*y) | x <- [-4..4], y <- [1..6]]
+    , speed = 300}
+
+  -- Insane Difficulty
+  handleKeys (EventKey (Char 'v') _ _ _) game@ Game { gameState = Title } = 
+    game { 
+      gameState = Playing
+    , paused = False
+    , bricks = genBricks--[True | x <- [-4..4], y <- [1..6]]
+    , brickloc = zip xs ys--[(100*x, 100+50*y) | x <- [-4..4], y <- [1..6]]
+    , speed = 500}
+      where
+        genBricks = [True | x <- [0..45]]
+        xs = [fst (randomR ((-500.0) :: Float, 400.0 :: Float) (mkStdGen x)) | x <- [0..44]]
+        ys = [fst (randomR (0.0 :: Float, 400.0 :: Float) (mkStdGen x)) | x <- [45..89]]
 
   -- For an 'r' keypress, reset the ball to the center.
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = initialState

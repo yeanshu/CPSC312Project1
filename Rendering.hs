@@ -8,10 +8,6 @@ module Rendering where
 
   paddleColor = blue
 
-  data Library = Library
-    { bgImg :: Picture
-    }
-
   --Make stateText
   mkStateText :: Color -> String -> Float -> Float -> Picture
   mkStateText col text x y = translate (-120) 0 $ scale x y $ color col $ Text text
@@ -44,6 +40,15 @@ module Rendering where
   mktitle3 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktitle3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press x to play"
 
+  mktitle4 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle4 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press z for easy mode"
+
+  mktitle5 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle5 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press c for hard mode"
+
+  mktitle6 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle6 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press v for insane mode"
+
   type Archive = (BreakoutGame, Picture)
   
   -- | Render game in IO
@@ -57,9 +62,13 @@ module Rendering where
 
   -- Title Screen
   render game @ Game { gameState = Title} bg = pictures [
-    mktitle1 white (-375) 300 1.2 1.5
+    bg
+    ,mktitle1 white (-375) 300 1.2 1.5
     ,mktitle2 white (-260) 150 0.3 0.3
-    ,mktitle3 white (-250) (-400) 0.5 0.5]
+    ,mktitle3 white (-250) (-350) 0.2 0.2
+    ,mktitle4 white (-250) (-390) 0.2 0.2
+    ,mktitle5 white (-250) (-430) 0.2 0.2
+    ,mktitle6 red (-250) (-470) 0.2 0.2]
 
   -- Paused state
   render game @ Game { gameState = Paused } bg =
