@@ -23,9 +23,12 @@ module EventHandler where
              -> BreakoutGame  -- ^ Initial game state
              -> BreakoutGame  -- ^ Game updated
 
+  -- For an 'x' keypress on title screen, play level
+  handleKeys (EventKey (Char 'x') _ _ _) game@ Game { gameState = Title } = 
+    game { gameState = Playing, paused = False}
+
   -- For an 'r' keypress, reset the ball to the center.
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } =
-    game { ballLoc = (0, 0), ballVel = (40, -140) }
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = initialState
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = initialState
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } = initialState
 

@@ -21,6 +21,7 @@ module Rendering where
           (paddleWidth - paddleBorder) (paddleHeight - paddleBorder)
     ]
 
+  --Make victory messages
   mkvictorytext :: Color -> Float -> Float -> Float -> Float -> Picture
   mkvictorytext col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Congratulations!"
 
@@ -30,6 +31,16 @@ module Rendering where
   mkvictorytext3 :: Color -> Float -> Float -> Float -> Float -> Picture
   mkvictorytext3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press R to replay"
 
+  --Make Title Screen messages
+  mktitle1 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle1 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "BREAKOUT"
+
+  mktitle2 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle2 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "by Yean, Jason, and Daniel"
+
+  mktitle3 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press x to play"
+  
   -- | Render game in IO
   renderIO :: (BreakoutGame -> IO Picture)
   renderIO game = return $ render game
@@ -38,19 +49,25 @@ module Rendering where
   render :: BreakoutGame  -- ^ The game state to render
          -> Picture   -- ^ A picture of this game state
 
+  -- Title Screen
+  render game @ Game { gameState = Title} = pictures [
+    mktitle1 white (-375) 300 1.2 1.5
+    ,mktitle2 white (-260) 150 0.3 0.3
+    ,mktitle3 white (-250) (-400) 0.5 0.5]
+
   -- Paused state
   render game @ Game { gameState = Paused } =
     mkStateText orange "PAUSED" 0.5 0.5
 
   -- Game Over
   render game @ Game { gameState = Over} =
-    translate (-300) 0 $ scale 0.5 0.5 $ color orange $ Text "Retry? Press R"
+    translate (-400) 0 $ scale 0.5 0.5 $ color orange $ Text "Retry? Press R"
 
   -- Game state win
   render game @ Game { gameState = Winner}  = pictures [ 
-    mkvictorytext orange (-200) 200 0.5 0.5
-    ,mkvictorytext2 orange (-100) 100 0.5 0.5
-    ,mkvictorytext3 orange (-250) 0 0.5 0.5] 
+    mkvictorytext orange (-450) 200 1.0 1.0
+    ,mkvictorytext2 orange (-150) 50 0.5 0.5
+    ,mkvictorytext3 orange (-300) (-300) 0.5 0.5] 
 
   -- Playing state
   render game @ Game { gameState = Playing } =
@@ -87,4 +104,5 @@ module Rendering where
 
       brickColor = aquamarine
       bricks = pictures [brick (fst x) (snd x) | x <- brickloc game]
+
 

@@ -24,7 +24,7 @@ update seconds =
 
 -- | Window
 window :: Display
-window = InWindow "Breakout" (width, height) (offset, offset)
+window = InWindow "Breakout" (width+500, height) (0, 0)
 
 -- | Background Color
 background :: Color
