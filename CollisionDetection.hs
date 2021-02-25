@@ -65,3 +65,19 @@ module CollisionDetection where
       -- if one brick is collided, should return true
       truth = or isTrueList
       isTrue = (truth,isTrueList)
+
+  -- Depending on where the ball hits the brick, return an int that signifies how the ball velocity will change
+  -- 1 = vx,vy --> -vx,-vy
+  -- 2 = vx,vy --> -vx, vy
+  -- 3 = vx,vy --> vx, -vy
+  brickCollisionConditions :: Float -> (Float, Float) -> (Float, Float) -> Int
+  brickCollisionConditions velx (cx,cy) (brickx, bricky)
+    | cy >= brickLBCornerY && cy <= brickLBCornerY + brickheight/3                              = 1
+    | cy >= brickLBCornerY + brickheight/3 && cy <= brickLBCornerY + brickheight                = 2
+    | velx > 0 && cx >= brickLBCornerX && cx <= brickLBCornerX + brickwidth/3                   = 1
+    | velx < 0 && cx <= brickLBCornerX + brickwidth && cx >= brickLBCornerX + 2*brickwidth/3    = 1
+    | otherwise                                                                                 = 3
+      where
+        brickLBCornerX = brickx - brickwidth/2
+        brickLBCornerY = bricky - brickheight/2
+    

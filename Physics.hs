@@ -121,12 +121,13 @@ module Physics where
   -- Helper function for brickBounce
   brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
   brickBounceTrue game lst = if (all not lst1) 
-    then game { gameState = Winner, paused = True } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
+    then game { gameState = Winner, paused = True } else game {ballVel = (vx', vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
     where
       (vx, vy) = ballVel game
       (ballX, ballY) = ballLoc game
       -- update velocity
-      vy' = (-vy)
+      -- vy' = (-vy)
+
       -- call helper to find index where brick was collided
       brickListIndex = getTrueIndex 0 lst
       -- update bricks
@@ -137,6 +138,14 @@ module Physics where
       splitlst2 = splitAt brickListIndex $ brickloc game
       splitlst2snd = snd splitlst2
       lst2 = fst splitlst2 ++ [(-100000,-100000)] ++ drop 1 splitlst2snd -- used -100000 as "equivalent" to INT_MIN in C
+      
+      currBrick = head splitlst2snd
+      cond = brickCollisionConditions vx (ballX,ballY) currBrick
+      vy' = if cond == 1 || cond == 3 then (-vy)
+            else vy -- cond == 2
+      vx' = if cond == 1 || cond == 2 then (-vx)
+            else vx -- cond ==
+
       curScore = score game
     
   -- Helper function for brickBounceTrue to find index where brick was collided
