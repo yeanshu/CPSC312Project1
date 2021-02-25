@@ -39,13 +39,14 @@ module Physics where
   -- return updated game state with new ball position
   moveBall :: Float -> BreakoutGame -> BreakoutGame
   -- When paused, don't move.
-  moveBall _ game@ Game { paused } | paused = game
+  moveBall _ game@ Game { paused } 
+    | paused = game
   -- Moving the ball.
   moveBall seconds game =
     if paused game 
       then game
     else if y' < (-300) 
-        then game { gameState = Over, paused = True }    -- if ball is below y=-300, update to game over state
+        then game { gameState = Over }    -- if ball is below y=-300, update to game over state
     else game { ballLoc = (x' , y')}
     where
       -- Old locations and velocities, time
@@ -61,7 +62,7 @@ module Physics where
   updateTime :: Float -> BreakoutGame -> BreakoutGame
   updateTime _ game@ Game { paused } | paused = game
   updateTime seconds game
-    | timemodeon game && time game >= timelimit game = game { gameState = Over, paused = True} -- if over time limit, update to game over state
+    | timemodeon game && time game >= timelimit game = game { gameState = Over} -- if over time limit, update to game over state
     | otherwise  = game {time = t'}
       where
         t = time game
@@ -121,7 +122,7 @@ module Physics where
   -- Helper function for brickBounce
   brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
   brickBounceTrue game lst = if (all not lst1) 
-    then game { gameState = Winner, paused = True } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
+    then game { gameState = Winner, paused = True, victorytime = completetime, fastesttime = currfastest} else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
     where
       (vx, vy) = ballVel game
       (ballX, ballY) = ballLoc game
@@ -138,6 +139,14 @@ module Physics where
       splitlst2snd = snd splitlst2
       lst2 = fst splitlst2 ++ [(-100000,-100000)] ++ drop 1 splitlst2snd -- used -100000 as "equivalent" to INT_MIN in C
       curScore = score game
+      -- find what the time when the level was completed
+      completetime = time game
+      previousfastest = fastesttime game
+      currfastest = 
+        if completetime > previousfastest
+          then previousfastest
+          else completetime
+
     
   -- Helper function for brickBounceTrue to find index where brick was collided
   -- Iterate until reached True then return i  
@@ -145,3 +154,4 @@ module Physics where
   getTrueIndex i lst
     | lst!!i == False = getTrueIndex (i+1) lst
     | otherwise = i
+  

@@ -84,9 +84,23 @@ module EventHandler where
       game {timemodeon = False} 
 
   -- Press R to go back to title
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = initialState
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = initialState
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } = initialState
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = game { gameState = Title
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game
+
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = game { gameState = Title
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game
+      
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } =  game { gameState = Title
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game
 
   -- Press P to pause game
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =
