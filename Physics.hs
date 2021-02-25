@@ -62,7 +62,7 @@ module Physics where
   updateTime :: Float -> BreakoutGame -> BreakoutGame
   updateTime _ game@ Game { paused } | paused = game
   updateTime seconds game
-    | timemodeon game && time game >= timelimit game = game { gameState = Over} -- if over time limit, update to game over state
+    | timemodeon game && time game >= timelimit game = game { gameState = Over, paused = True} -- if over time limit, update to game over state
     | otherwise  = game {time = t'}
       where
         t = time game
