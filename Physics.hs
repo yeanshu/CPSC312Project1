@@ -71,7 +71,7 @@ module Physics where
   -- change the velocity of the ball to bounce it off the paddle.
   paddleBounce :: BreakoutGame -> BreakoutGame
   paddleBounce game = 
-    game { ballVel = (vx', vy') }
+    game { ballVel = (vx', vy'), speed = newSpeed }
     where
         pv = player1v game
         px = player1 game
@@ -80,20 +80,20 @@ module Physics where
         nx = (x-px)/50
         ny = 1 - (nx^2)
         curSpeed = speed game
-        vx' = if paddleCollision game -- && vy < 0
+        vx' = if paddleCollision game && vy < 0
               then
                 vx - 2*((x-pv)*nx + y*ny)*nx
                 else
                 vx
 
-        vy' = if paddleCollision game -- && vy < 0
+        vy' = if paddleCollision game && vy < 0
               then
                   -- Update the velocity
                   vy - 2*((x-pv)*nx + y*ny)*ny
                   else
                   -- Do nothing.Return the old velocity
                   vy
-        newSpeed = if pv /= 0
+        newSpeed = if pv /= 0 && paddleCollision game && vy < 0
                    then curSpeed + 10
                    else curSpeed
 
