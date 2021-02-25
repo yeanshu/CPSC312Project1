@@ -18,47 +18,33 @@ module Physics where
   -- | Move both paddles depending on the velocity
   movePaddles :: BreakoutGame -- ^ Initial game state
               -> BreakoutGame -- ^ new game with updated paddle position
-  movePaddles game = game { player1 = movePaddle paddleStep (player1v game) (player1 game)
-                          }
+  movePaddles game = 
+    game { player1 = nx}
+      where
+        x = player1 game
+        vx = player1v game
 
-  -- | Update the paddle position
-  movePaddle :: Float     -- ^ The step
-             -> Float     -- ^ Paddle's velocity
-             -> Float     -- ^ The initial player state
-             -> Float     -- ^ The new player state with an updated paddle position
+        nx =
+          if vx == 0
+            then x
+          else if x >= fromIntegral offset && vx < 0
+            then x + vx
+          else if x <= fromIntegral (-offset) && vx > 0
+            then x + vx
+          else if x > fromIntegral (-offset) && x < fromIntegral offset 
+            then x + vx
+          else x
 
-
-  movePaddle step velocity player
-
-        -- ^ No step , no mouvement
-        | velocity == 0 = player
-        -- ^ Below ceiling, but trying to go down.
-        | player >= fromIntegral offset && velocity < 0 =
-            player + (step *  velocity)
-        -- ^ Under floor, but trying to go up.
-        | player <= fromIntegral (-offset) && velocity > 0 =
-            player + (step *  velocity)
-        -- ^Between the two walls.
-        | player > fromIntegral (-offset) && player < fromIntegral offset =
-            player + (step *  velocity)
-        | otherwise = player
-
-  -- | Ball Universe
-
-  -- | Update the ball position using its current velocity.
-  moveBall :: Float     -- ^ The number of seconds since last Update
-           -> BreakoutGame  -- ^ The initial game state
-           -> BreakoutGame  -- ^ A new game state with an updated ball position
-
-
+  -- Given number of seconds passed since last update and initial game state, 
+  -- return updated game state with new ball position
+  moveBall :: Float -> BreakoutGame -> BreakoutGame
   -- When paused, don't move.
   moveBall _ game@ Game { paused } | paused = game
-
   -- Moving the ball.
   moveBall seconds game =
     if y' < (-300)
-        then game { gameState = Over }
-    else game { ballLoc = (x' , y') }
+        then game { gameState = Over }    -- if ball is below y=-300, update to game over state
+    else game { ballLoc = (x' , y')}
     where
       -- Old locations and velocities
       (x, y) = ballLoc game
@@ -67,13 +53,12 @@ module Physics where
       --New locations
       x' = x + nvx * seconds
       y' = y + nvy * seconds
+      
 
 
-  -- | Detect a collision with a paddle. Upon collisions,
+  -- Detect a collision with a paddle. Upon collisions,
   -- change the velocity of the ball to bounce it off the paddle.
-  paddleBounce :: BreakoutGame  -- ^ The initial game state
-               -> BreakoutGame  -- ^ A new game state with an updated ball velocity
-
+  paddleBounce :: BreakoutGame -> BreakoutGame
   paddleBounce game = 
     game { ballVel = (vx', vy') }
     where
@@ -102,26 +87,16 @@ module Physics where
                    else curSpeed
 
 
-  -- | Detect a collision with one of the side walls. Upon collisions,
+  -- Checks if there is collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
-  wallBounce :: BreakoutGame  -- ^ The initial game state
-             -> BreakoutGame  -- ^ A new game state with an updated ball velocity
-
+  wallBounce :: BreakoutGame -> BreakoutGame 
   wallBounce game = game { ballVel = (vx', vy') }
     where
-        -- Radius. Use the same thing as in `render`.
-
         -- The old Velocities.
         (vx, vy) = ballVel game
-
-        vy' = if wallCollisionTB (ballLoc game) ballRadius
-              then
-                  -- Update the velocity
-                  (-vy)
-                  -- -vy
-                  else
-                  -- Do nothing.Return te old velocity
-                  vy
+        -- if collide with top and bottom walls, update the y velocity; else maintain original y velocity
+        -- if collide with left and right walls, update the x velocity; else maintain original x velocity
+        vy' = if wallCollisionTB (ballLoc game) ballRadius then (-vy) else vy
         vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx
 
   -- Check if ball collides with a wall. If true, update ball velocity to bounce off
