@@ -22,6 +22,9 @@ module Rendering where
   mkvictorytext4 :: Color -> Float -> Float -> Float -> Float -> Float  -> Picture
   mkvictorytext4 col x y scalex scaley time = translate x y $ scale scalex scaley $ color col $ Text ("Time: " ++ (show $ round (time)))
 
+  mkvictorytext5 :: Color -> Float -> Float -> Float -> Float -> Float -> Picture
+  mkvictorytext5 col x y scalex scaley fastest = translate x y $ scale scalex scaley $ color col $ Text ("Your fastest time is: " ++ (show $ round (fastest)))
+
   --Make Title Screen messages
   mktitle1 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktitle1 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "BREAKOUT"
@@ -49,6 +52,9 @@ module Rendering where
 
   mktimetoggletext2 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktimetoggletext2 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Time limit mode: OFF"
+  
+  mktimedisplay :: Color -> Float -> Float -> Float -> Float -> Float -> Picture
+  mktimedisplay col x y scalex scaley time = translate x y $ scale scalex scaley $ color col $ Text ("Fastest Time: " ++ (show $ round (time)))
 
   type Archive = (BreakoutGame, Picture)
   
@@ -71,13 +77,16 @@ module Rendering where
     ,mktitle5 white (-250) (-430) 0.2 0.2
     ,mktitle6 red (-250) (-470) 0.2 0.2
     ,mktitle7 white (-250) (-300) 0.2 0.2
-    ,timermodetoggle white (-250) (-250) 0.2 0.2]
+    ,timermodetoggle white (-250) (-200) 0.2 0.2
+    ,mktimedisplay white 100 250 0.2 0.2 (fastesttime game)]
 
     where 
       timermodetoggle col x y scalex scaley= 
         if timemodeon game 
           then mktimetoggletext col x y scalex scaley 
           else mktimetoggletext2 col x y scalex scaley
+
+
 
   -- Paused state
   render game @ Game { gameState = Paused } bg =
@@ -92,10 +101,12 @@ module Rendering where
     mkvictorytext orange (-450) 200 1.0 1.0
     ,mkvictorytext2 orange (-150) 50 0.5 0.5
     ,mkvictorytext3 orange (-300) (-300) 0.5 0.5
-    ,mkvictorytext4 orange (-250) (-400) 0.5 0.5 timetaken]
+    ,mkvictorytext4 orange (-300) (-375) 0.5 0.5 timetaken
+    ,mkvictorytext5 orange (-300) (-450) 0.5 0.5 fastest]
 
     where
-      timetaken = time game 
+      timetaken = victorytime game 
+      fastest = fastesttime game
 
   -- Playing state
   render game @ Game { gameState = Playing } bg=
@@ -148,5 +159,6 @@ module Rendering where
         if timemodeon game 
           then translate 510 430 $ scale 0.15 0.15 $ color orange $ Text ("Time left: " ++ (show $ round (timelimit game - time)))
            else translate 510 430 $ scale 0.15 0.15 $ color orange $ Text ("Time: " ++ (show $ round (time)))
+ 
  
 
