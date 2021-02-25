@@ -33,7 +33,7 @@ module Rendering where
   mktitle2 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "by Yean, Jason, and Daniel"
 
   mktitle3 :: Color -> Float -> Float -> Float -> Float -> Picture
-  mktitle3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press x to play"
+  mktitle3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press x for standard mode"
 
   mktitle4 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktitle4 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press z for easy mode"
