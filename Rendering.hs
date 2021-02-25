@@ -6,19 +6,8 @@ module Rendering where
 
   import Graphics.Gloss
 
-  paddleColor = blue
-
-  --Make stateText
-  mkStateText :: Color -> String -> Float -> Float -> Picture
-  mkStateText col text x y = translate (-120) 0 $ scale x y $ color col $ Text text
-
-  --Make a paddle of a given border and vertical offset.
-  mkPaddle :: Color -> Float -> Float -> Picture
-  mkPaddle col x y = pictures
-    [ translate x y $ color col $ rectangleSolid paddleWidth paddleHeight
-    , translate x y $ color paddleColor $ rectangleSolid
-          (paddleWidth - paddleBorder) (paddleHeight - paddleBorder)
-    ]
+  -- Following make-text functions displays a Picture of the text given
+  -- the color of text, x and y position of text and the scale of the text (x and y)
 
   --Make victory messages
   mkvictorytext :: Color -> Float -> Float -> Float -> Float -> Picture
@@ -29,6 +18,9 @@ module Rendering where
 
   mkvictorytext3 :: Color -> Float -> Float -> Float -> Float -> Picture
   mkvictorytext3 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press R to replay"
+
+  mkvictorytext4 :: Color -> Float -> Float -> Float -> Float -> Float  -> Picture
+  mkvictorytext4 col x y scalex scaley time = translate x y $ scale scalex scaley $ color col $ Text ("Time: " ++ (show $ round (time)))
 
   --Make Title Screen messages
   mktitle1 :: Color -> Float -> Float -> Float -> Float -> Picture
@@ -49,6 +41,15 @@ module Rendering where
   mktitle6 :: Color -> Float -> Float -> Float -> Float -> Picture
   mktitle6 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press v for insane mode"
 
+  mktitle7 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktitle7 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Press b to toggle time limit mode"
+
+  mktimetoggletext :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktimetoggletext col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Time limit mode: ON"
+
+  mktimetoggletext2 :: Color -> Float -> Float -> Float -> Float -> Picture
+  mktimetoggletext2 col x y scalex scaley = translate x y $ scale scalex scaley $ color col $ Text "Time limit mode: OFF"
+
   type Archive = (BreakoutGame, Picture)
   
   -- | Render game in IO
@@ -68,11 +69,19 @@ module Rendering where
     ,mktitle3 white (-250) (-350) 0.2 0.2
     ,mktitle4 white (-250) (-390) 0.2 0.2
     ,mktitle5 white (-250) (-430) 0.2 0.2
-    ,mktitle6 red (-250) (-470) 0.2 0.2]
+    ,mktitle6 red (-250) (-470) 0.2 0.2
+    ,mktitle7 white (-250) (-300) 0.2 0.2
+    ,timermodetoggle white (-250) (-250) 0.2 0.2]
+
+    where 
+      timermodetoggle col x y scalex scaley= 
+        if timemodeon game 
+          then mktimetoggletext col x y scalex scaley 
+          else mktimetoggletext2 col x y scalex scaley
 
   -- Paused state
   render game @ Game { gameState = Paused } bg =
-    mkStateText orange "PAUSED" 0.5 0.5
+    translate (-400) 0 $ scale 0.8 0.8 $ color orange $ Text "Paused"
 
   -- Game Over
   render game @ Game { gameState = Over} bg =
@@ -82,17 +91,25 @@ module Rendering where
   render game @ Game { gameState = Winner} bg = pictures [ 
     mkvictorytext orange (-450) 200 1.0 1.0
     ,mkvictorytext2 orange (-150) 50 0.5 0.5
-    ,mkvictorytext3 orange (-300) (-300) 0.5 0.5] 
+    ,mkvictorytext3 orange (-300) (-300) 0.5 0.5
+    ,mkvictorytext4 orange (-250) (-400) 0.5 0.5 timetaken]
+
+    where
+      timetaken = time game 
 
   -- Playing state
   render game @ Game { gameState = Playing } bg=
     pictures [bg, ball, walls, bricks,
-              mkPaddle blue (player1 game) (-200), scoreRender (score game)]
+              mkPaddle blue (player1 game) (-200), scoreRender (score game), timeLimitRender (time game)]
 
     where
       -- The Breakout ball.
       ball = uncurry translate (ballLoc game) $ color ballColor $ circleSolid ballRadius
       ballColor = dark red
+      
+        --Make a paddle of a given border and vertical offset.
+      mkPaddle :: Color -> Float -> Float -> Picture
+      mkPaddle col x y = translate x y $ color col $ rectangleSolid paddleWidth paddleHeight
 
       -- The bottom and top walls
       wall :: Float -> Picture
@@ -111,6 +128,7 @@ module Rendering where
       wallColor = greyN 0.5
       walls = pictures [wall 500, wall (-500), walltop 500, walltop (-500)]
 
+      --Brick textures
       brick :: Float -> Float -> Picture
       brick offset offset2=
         translate offset offset2 $
@@ -119,6 +137,16 @@ module Rendering where
 
       brickColor = aquamarine
       bricks = pictures [brick (fst x) (snd x) | x <- brickloc game]
-
+      
+      --Scoreboard texture
       scoreRender :: Int -> Picture
-      scoreRender score = translate 510 450 $ scale 0.15 0.15 $ color orange $ Text ("Score: " ++ (show score))
+      scoreRender score = translate 510 450 $ scale 0.15 0.15 $ color orange $ Text ("Score: " ++ show score)
+
+      -- Time Limit texture 
+      timeLimitRender :: Float -> Picture
+      timeLimitRender time = 
+        if timemodeon game 
+          then translate 510 430 $ scale 0.15 0.15 $ color orange $ Text ("Time left: " ++ (show $ round (timelimit game - time)))
+           else translate 510 430 $ scale 0.15 0.15 $ color orange $ Text ("Time: " ++ (show $ round (time)))
+ 
+

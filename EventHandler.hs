@@ -9,6 +9,7 @@ module EventHandler where
   import System.Exit
   import System.Random
 
+  -- Hack in order to add images to game
   type Archive = (BreakoutGame,Picture)
 
   handleKeysAIO :: Event -> Archive -> IO Archive
@@ -16,13 +17,10 @@ module EventHandler where
     game <- handleKeysIO e (fst w)
     return (game, p)
 
-  -- | Respond to key events in IO.
   handleKeysIO :: (Event -> BreakoutGame -> IO BreakoutGame) -- ^ handleKeys function in IO
 
-  -- For an 'q' keypress, exit the game
+  -- Press Q to quit game
   handleKeysIO (EventKey (Char 'q') Up _ _) game = exitSuccess
-
-  -- | Just return the same function as handleKeys but in IO
   handleKeysIO event game = return $ handleKeys event game
 
 
@@ -31,11 +29,12 @@ module EventHandler where
              -> BreakoutGame  -- ^ Initial game state
              -> BreakoutGame  -- ^ Game updated
 
-  -- For an 'x' keypress on title screen, play level
+  -- Press X to Play Game
   handleKeys (EventKey (Char 'x') _ _ _) game@ Game { gameState = Title } = 
     game { gameState = Playing, paused = False}
 
-  -- Easy Difficulty
+  -- Press Z for Easy Mode
+  -- Fewer Blocks, Slower Ball
   handleKeys (EventKey (Char 'z') _ _ _) game@ Game { gameState = Title } = 
     game { 
       gameState = Playing
@@ -44,7 +43,8 @@ module EventHandler where
     , brickloc = [(100*x, 100+50*y) | x <- [-3,0,3], y <- [1,3,5]]
     , speed = 150}
 
-  -- Hard Difficulty
+  -- Press C for Hard Mode
+  -- More Blocks, Faster Ball
   handleKeys (EventKey (Char 'c') _ _ _) game@ Game { gameState = Title } = 
     game { 
       gameState = Playing
@@ -53,7 +53,8 @@ module EventHandler where
     , brickloc = [(100*x, 100+50*y) | x <- [-4..4], y <- [1..6]]
     , speed = 300}
 
-  -- Insane Difficulty
+  -- Press V for Insane Mode
+  -- Even Faster Ball, Randomized Blocks
   handleKeys (EventKey (Char 'v') _ _ _) game@ Game { gameState = Title } = 
     game { 
       gameState = Playing
@@ -66,18 +67,35 @@ module EventHandler where
         xs = [fst (randomR ((-500.0) :: Float, 400.0 :: Float) (mkStdGen x)) | x <- [0..44]]
         ys = [fst (randomR (0.0 :: Float, 400.0 :: Float) (mkStdGen x)) | x <- [45..89]]
 
-  -- For an 'r' keypress, reset the ball to the center.
+  -- Press t for Debug Test Mode
+  -- ONLY USED FOR TA DEMO
+  handleKeys (EventKey (Char 't') _ _ _) game@ Game { gameState = Title } = 
+    game { 
+      gameState = Playing
+    , paused = False
+    , bricks = [True]
+    , brickloc = [(0, 100)]
+    , speed = 200}
+
+  -- Press b to toggle time limit mode
+  handleKeys (EventKey (Char 'b') Down _ _) game@ Game { gameState = Title, timemodeon = False } =
+      game {timemodeon = True} 
+  handleKeys (EventKey (Char 'b') Down _ _) game@ Game { gameState = Title, timemodeon = True } =
+      game {timemodeon = False} 
+
+  -- Press R to go back to title
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = initialState
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = initialState
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } = initialState
 
-  -- For an 'p' keypress, pause the game.
+  -- Press P to pause game
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =
-    game { gameState = Paused }
+    game { gameState = Paused, paused = True}
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Paused } =
-    game { gameState = Playing }
+    game { gameState = Playing, paused = False}
 
-  -- For an 'Left' or 'Right' keypress, move paddle horizontally
+  -- Moves Player paddle
+  -- Key down starts movement, key up ends movement
   handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) game =
     game { player1v = -1 }
   handleKeys (EventKey (SpecialKey KeyLeft) Up _ _) game =
@@ -87,5 +105,5 @@ module EventHandler where
   handleKeys (EventKey (SpecialKey KeyRight) Up _ _) game =
     game { player1v = 0 }
 
-  -- Do nothing for all other events.
+  -- Nothing
   handleKeys _ game = game

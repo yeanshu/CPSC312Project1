@@ -1,14 +1,14 @@
 module GameBoard where
 
-  paddleWidth, paddleHeight, paddleBorder, paddlesDistance, paddleStep, ballRadius, brickwidth, brickheight  :: Float
+  paddleWidth, paddleHeight, paddleBorder, paddlesDistance, ballRadius, brickwidth, brickheight, defaultTimeLimit:: Float
   paddleWidth = 86
   paddleHeight = 25
   paddleBorder = 1
   paddlesDistance = 0
-  paddleStep = 10
   ballRadius = 10
   brickwidth = 80
   brickheight = 30
+  defaultTimeLimit = 150
 
   width, height, offset:: Int
   width = 1000
@@ -37,6 +37,9 @@ module GameBoard where
     , brickloc :: [(Float, Float)] -- list of brick locations
     , score :: Int            -- Current Score
     , speed :: Float          -- Speed of ball
+    , timelimit :: Float      -- time limit for game before game over screen
+    , time :: Float           -- current time 
+    , timemodeon :: Bool      -- toggle time limit mode
     } deriving Show
 
   -- | Initialize the game with this game state.
@@ -52,4 +55,7 @@ module GameBoard where
     , brickloc = [(100*x, 100+50*y) | x <- [-3..3], y <- [1..5]]
     , score = 0
     , speed = 200
+    , timelimit = defaultTimeLimit
+    , time = 0
+    , timemodeon = False
     }

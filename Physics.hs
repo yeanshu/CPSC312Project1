@@ -42,19 +42,30 @@ module Physics where
   moveBall _ game@ Game { paused } | paused = game
   -- Moving the ball.
   moveBall seconds game =
-    if y' < (-300)
-        then game { gameState = Over }    -- if ball is below y=-300, update to game over state
+    if paused game 
+      then game
+    else if y' < (-300) 
+        then game { gameState = Over, paused = True }    -- if ball is below y=-300, update to game over state
     else game { ballLoc = (x' , y')}
     where
-      -- Old locations and velocities
+      -- Old locations and velocities, time
       (x, y) = ballLoc game
       (vx, vy) = ballVel game
       (nvx, nvy) = normalize vx vy $ speed game
       --New locations
       x' = x + nvx * seconds
       y' = y + nvy * seconds
-      
 
+  -- Given number of seconds passed since last update and initial game state,
+  -- return updated game state with updated timer
+  updateTime :: Float -> BreakoutGame -> BreakoutGame
+  updateTime _ game@ Game { paused } | paused = game
+  updateTime seconds game
+    | timemodeon game && time game >= timelimit game = game { gameState = Over, paused = True} -- if over time limit, update to game over state
+    | otherwise  = game {time = t'}
+      where
+        t = time game
+        t' = t + seconds
 
   -- Detect a collision with a paddle. Upon collisions,
   -- change the velocity of the ball to bounce it off the paddle.
@@ -110,7 +121,7 @@ module Physics where
   -- Helper function for brickBounce
   brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
   brickBounceTrue game lst = if (all not lst1) 
-    then game { gameState = Winner } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
+    then game { gameState = Winner, paused = True } else game {ballVel = (vx, vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
     where
       (vx, vy) = ballVel game
       (ballX, ballY) = ballLoc game
