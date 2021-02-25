@@ -31,7 +31,11 @@ module EventHandler where
 
   -- Press X to Play Game
   handleKeys (EventKey (Char 'x') _ _ _) game@ Game { gameState = Title } = 
-    game { gameState = Playing, paused = False}
+    game { gameState = Playing
+      , paused = False
+      , bricks = [True | x <- [-3..3], y <- [1..5]]
+      , brickloc = [(100*x, 100+50*y) | x <- [-3..3], y <- [1..5]]
+      , speed = 200}
 
   -- Press Z for Easy Mode
   -- Fewer Blocks, Slower Ball
