@@ -46,7 +46,7 @@ module Physics where
     if paused game 
       then game
     else if y' < (-300) 
-        then game { gameState = Over }    -- if ball is below y=-300, update to game over state
+        then game { gameState = Over, paused = True }    -- if ball is below y=-300, update to game over state
     else game { ballLoc = (x' , y')}
     where
       -- Old locations and velocities, time
