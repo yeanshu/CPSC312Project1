@@ -83,10 +83,54 @@ module EventHandler where
   handleKeys (EventKey (Char 'b') Down _ _) game@ Game { gameState = Title, timemodeon = True } =
       game {timemodeon = False} 
 
-  -- Press R to go back to title
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = initialState
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = initialState
-  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } = initialState
+  -- Press R to go back to title keeping track of fastest victory time
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Playing } = game { gameState = Title
+    , ballLoc = (-100, -100)
+    , ballVel = (40, 200)
+    , player1 = 0
+    , player1v = 0
+    , paused  = True
+    , score = 0
+    , time = 0
+    , timemodeon = timemodetoggle
+    , victorytime = 0
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game --- keeps track of fastest time
+      timemodetoggle = timemodeon game
+
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = game { gameState = Title
+    , ballLoc = (-100, -100)
+    , ballVel = (40, 200)
+    , player1 = 0
+    , player1v = 0
+    , paused  = True
+    , score = 0
+    , time = 0
+    , timemodeon = timemodetoggle
+    , victorytime = 0
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game --- keeps track of fastest time
+      timemodetoggle = timemodeon game
+      
+  handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } =  game { gameState = Title
+    , ballLoc = (-100, -100)
+    , ballVel = (40, 200)
+    , player1 = 0
+    , player1v = 0
+    , paused  = True
+    , score = 0
+    , time = 0
+    , timemodeon = timemodetoggle
+    , victorytime = 0
+    , fastesttime = fastest
+  }
+    where
+      fastest = fastesttime game --- keeps track of fastest time
+      timemodetoggle = timemodeon game
 
   -- Press P to pause game
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =

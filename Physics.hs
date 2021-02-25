@@ -39,7 +39,8 @@ module Physics where
   -- return updated game state with new ball position
   moveBall :: Float -> BreakoutGame -> BreakoutGame
   -- When paused, don't move.
-  moveBall _ game@ Game { paused } | paused = game
+  moveBall _ game@ Game { paused } 
+    | paused = game
   -- Moving the ball.
   moveBall seconds game =
     if paused game 
@@ -121,13 +122,11 @@ module Physics where
   -- Helper function for brickBounce
   brickBounceTrue :: BreakoutGame -> [Bool] -> BreakoutGame
   brickBounceTrue game lst = if (all not lst1) 
-    then game { gameState = Winner, paused = True } else game {ballVel = (vx', vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
+    then game { gameState = Winner, paused = True, victorytime = completetime, fastesttime = currfastest} else game {ballVel = (vx', vy'), bricks = lst1, brickloc = lst2, score = curScore + 10}
     where
       (vx, vy) = ballVel game
       (ballX, ballY) = ballLoc game
-      -- update velocity
-      -- vy' = (-vy)
-
+      
       -- call helper to find index where brick was collided
       brickListIndex = getTrueIndex 0 lst
       -- update bricks
@@ -139,14 +138,23 @@ module Physics where
       splitlst2snd = snd splitlst2
       lst2 = fst splitlst2 ++ [(-100000,-100000)] ++ drop 1 splitlst2snd -- used -100000 as "equivalent" to INT_MIN in C
       
+      -- update velocity
       currBrick = head splitlst2snd
       cond = brickCollisionConditions vx (ballX,ballY) currBrick
       vy' = if cond == 1 || cond == 3 then (-vy)
             else vy -- cond == 2
       vx' = if cond == 1 || cond == 2 then (-vx)
-            else vx -- cond ==
+            else vx -- cond == 3
 
       curScore = score game
+      -- find what the time when the level was completed
+      completetime = time game
+      previousfastest = fastesttime game
+      currfastest = 
+        if completetime > previousfastest
+          then previousfastest
+          else completetime
+
     
   -- Helper function for brickBounceTrue to find index where brick was collided
   -- Iterate until reached True then return i  
@@ -154,3 +162,4 @@ module Physics where
   getTrueIndex i lst
     | lst!!i == False = getTrueIndex (i+1) lst
     | otherwise = i
+  

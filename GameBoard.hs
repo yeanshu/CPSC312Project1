@@ -40,6 +40,8 @@ module GameBoard where
     , timelimit :: Float      -- time limit for game before game over screen
     , time :: Float           -- current time 
     , timemodeon :: Bool      -- toggle time limit mode
+    , victorytime :: Float    -- how fast this current run 
+    , fastesttime :: Float    -- how fast the fastest run is
     } deriving Show
 
   -- | Initialize the game with this game state.
@@ -58,4 +60,6 @@ module GameBoard where
     , timelimit = defaultTimeLimit
     , time = 0
     , timemodeon = False
+    , victorytime = 0
+    , fastesttime = 999
     }
