@@ -30,18 +30,17 @@ module GameBoard where
     , ballLoc :: (Float, Float) -- ^ Breakout ball (x, y) location.
     , ballVel :: (Float, Float) -- ^ Breakout ball (x, y) velocity.
     , player1 :: Float          -- ^ Paddle x location
-                                -- Zero is the middle of the screen.
-    , player1v :: Float   -- ^ player1's paddle's velocity.
+    , player1v :: Float         -- ^ Paddle's velocity.
     , paused :: Bool            -- ^ if the game is paused
-    , bricks :: [Bool]      -- list of bricks (if not broken, then true; else if broken, then false)
+    , bricks :: [Bool]          -- list of bricks (if not broken, then true; else if broken, then false)
     , brickloc :: [(Float, Float)] -- list of brick locations
-    , score :: Int            -- Current Score
-    , speed :: Float          -- Speed of ball
-    , timelimit :: Float      -- time limit for game before game over screen
-    , time :: Float           -- current time 
-    , timemodeon :: Bool      -- toggle time limit mode
-    , victorytime :: Float    -- how fast this current run 
-    , fastesttime :: Float    -- how fast the fastest run is
+    , score :: Int              -- Current Score
+    , speed :: Float            -- Speed of ball
+    , timelimit :: Float        -- time limit for game before game over screen
+    , time :: Float             -- current time 
+    , timemodeon :: Bool        -- the toggle for time limit mode
+    , victorytime :: Float      -- time taken to beat a level
+    , fastesttime :: Float      -- fastest time in current session
     } deriving Show
 
   -- | Initialize the game with this game state.

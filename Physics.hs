@@ -15,25 +15,22 @@ module Physics where
       nx = x / norm * f
       ny = y / norm * f
 
-  -- | Move both paddles depending on the velocity
-  movePaddles :: BreakoutGame -- ^ Initial game state
-              -> BreakoutGame -- ^ new game with updated paddle position
+  -- Move paddle depending on position and velocity
+  movePaddles :: BreakoutGame -> BreakoutGame
   movePaddles game = 
-    game { player1 = nx}
+    game { player1 = newx}
       where
         x = player1 game
         vx = player1v game
-
-        nx =
-          if vx == 0
-            then x
-          else if x >= fromIntegral offset && vx < 0
-            then x + vx
-          else if x <= fromIntegral (-offset) && vx > 0
-            then x + vx
-          else if x > fromIntegral (-offset) && x < fromIntegral offset 
-            then x + vx
-          else x
+        newx = if vx == 0 
+                then x -- paddle is not moving
+               else if x >= fromIntegral offset && vx < 0  -- paddle moving left; position is right of  left wall
+                then x + vx
+               else if x <= fromIntegral (-offset) && vx > 0  -- paddle moving right; position is left of right wall
+                 then x + vx
+               else if x > fromIntegral (-offset) && x < fromIntegral offset  -- paddle is between the left and right walls
+                 then x + vx
+               else x
 
   -- Given number of seconds passed since last update and initial game state, 
   -- return updated game state with new ball position
@@ -68,8 +65,9 @@ module Physics where
         t = time game
         t' = t + seconds
 
-  -- Detect a collision with a paddle. Upon collisions,
-  -- change the velocity of the ball to bounce it off the paddle.
+  -- Detect a collision with a paddle. Upon collision,
+  -- change the velocity/speed of the ball to bounce it off the paddle.
+  -- If no collision, maintain original velocity/speed
   paddleBounce :: BreakoutGame -> BreakoutGame
   paddleBounce game = 
     game { ballVel = (vx', vy'), speed = newSpeed }
@@ -81,33 +79,27 @@ module Physics where
         nx = (x-px)/50
         ny = 1 - (nx^2)
         curSpeed = speed game
+        -- 2*((x-pv)*nx + y*ny)*nx is some matrix multiplication to calculate
+        -- velocity change
         vx' = if paddleCollision game && vy < 0
-              then
-                vx - 2*((x-pv)*nx + y*ny)*nx
-                else
-                vx
-
+                then vx - 2*((x-pv)*nx + y*ny)*nx
+              else vx
         vy' = if paddleCollision game && vy < 0
-              then
-                  -- Update the velocity
-                  vy - 2*((x-pv)*nx + y*ny)*ny
-                  else
-                  -- Do nothing.Return the old velocity
-                  vy
+                then vy - 2*((x-pv)*nx + y*ny)*ny
+              else vy
         newSpeed = if pv /= 0 && paddleCollision game && vy < 0
-                   then curSpeed + 10
+                    then curSpeed + 10
                    else curSpeed
 
 
   -- Checks if there is collision with one of the side walls. Upon collisions,
   -- update the velocity of the ball to bounce it off the wall.
+  -- Otherwise maintain original velocity
   wallBounce :: BreakoutGame -> BreakoutGame 
   wallBounce game = game { ballVel = (vx', vy') }
     where
         -- The old Velocities.
         (vx, vy) = ballVel game
-        -- if collide with top and bottom walls, update the y velocity; else maintain original y velocity
-        -- if collide with left and right walls, update the x velocity; else maintain original x velocity
         vy' = if wallCollisionTB (ballLoc game) ballRadius then (-vy) else vy
         vx' = if wallCollisionLR (ballLoc game) ballRadius then (-vx) else vx
 
@@ -146,7 +138,9 @@ module Physics where
       vx' = if cond == 1 || cond == 2 then (-vx)
             else vx -- cond == 3
 
+      -- update score
       curScore = score game
+
       -- find what the time when the level was completed
       completetime = time game
       previousfastest = fastesttime game
@@ -155,7 +149,6 @@ module Physics where
           then previousfastest
           else completetime
 
-    
   -- Helper function for brickBounceTrue to find index where brick was collided
   -- Iterate until reached True then return i  
   getTrueIndex:: Int -> [Bool] -> Int

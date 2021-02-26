@@ -2,10 +2,8 @@ module CollisionDetection where
 
   import GameBoard
 
-  -- | Given position and radius of the ball, return whether a collision occurred on a player
-  -- paddleCollision :: BreakoutGame -- ^ The game
-  --                 -> Bool     -- ^ Collision with the paddles?
-
+  -- Return True if the ball has collided with the paddle
+  paddleCollision :: BreakoutGame -> Bool
   paddleCollision game =
     ((deltaXP1 * deltaXP1 + deltaYP1 * deltaYP1) <
       (ballRadius * ballRadius)) 
@@ -21,18 +19,6 @@ module CollisionDetection where
 
       deltaXP1 = ballX - max rectCornerXP1 (min ballX (rectCornerXP1 + paddleWidth))
       deltaYP1 = ballY - max rectCornerYP1 (min ballY (rectCornerYP1 + paddleHeight))
-
-  -- paddleCollision :: BreakoutGame -> Bool
-  -- paddleCollision game =
-  --   vy < 0 && x > pleft && x < pright && y > -200 && y < -190
-  --     where
-  --       (x, y) = ballLoc game
-  --       (vx, vy) = ballVel game
-  --       px = player1 game
-  --       pleft = px - paddleWidth/2
-  --       pright = px + paddleWidth/2
-
-
 
   -- Return true if ball collides with top or bottom wall given ball position and radius
   wallCollisionTB :: Position -> Radius -> Bool
@@ -66,10 +52,16 @@ module CollisionDetection where
       truth = or isTrueList
       isTrue = (truth,isTrueList)
 
-  -- Depending on where the ball hits the brick, return an int that signifies how the ball velocity will change
-  -- 1 = vx,vy --> -vx,-vy
-  -- 2 = vx,vy --> -vx, vy
-  -- 3 = vx,vy --> vx, -vy
+  -- Depending on where the ball hits the brick, return an int which signifies how the ball velocity will change in Physics.hs
+  --    1) if ball (coming from left side) hits bottom-left corner to corner + 1/3 width of brick (in x) or
+  --       if ball (coming from right side) hits bottom-right corner to corner - 1/3 width of brick (in x) or
+  --       if ball hits corner + 1/3 height of brick (in y)
+  --            vx,vy --> -vx,-vy
+  --    2) if ball hits corner + 1/3 height of brick to top of the brick (in y)
+  --            vx,vy --> -vx, vy
+  --    3) if ball (coming from left side) hits bottom-left corner + 1/3 width of brick to bottom-right corner (in x) or
+  --       if ball (coming from right side) hits bottom-right corner - 1/3 width of brick to bottom-left corner (in x)
+  --            vx,vy --> vx, -vy
   brickCollisionConditions :: Float -> (Float, Float) -> (Float, Float) -> Int
   brickCollisionConditions velx (cx,cy) (brickx, bricky)
     | cy >= brickLBCornerY && cy <= brickLBCornerY + brickheight/3                              = 1
