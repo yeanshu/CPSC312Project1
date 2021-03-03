@@ -96,13 +96,8 @@ module EventHandler where
     , paused  = True
     , score = 0
     , time = 0
-    , timemodeon = timemodetoggle
     , victorytime = 0
-    , fastesttime = fastest
   }
-    where
-      fastest = fastesttime game --- keeps track of fastest time
-      timemodetoggle = timemodeon game
 
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Over } = game { gameState = Title
     , ballLoc = (-100, -100)
@@ -112,13 +107,8 @@ module EventHandler where
     , paused  = True
     , score = 0
     , time = 0
-    , timemodeon = timemodetoggle
     , victorytime = 0
-    , fastesttime = fastest
   }
-    where
-      fastest = fastesttime game --- keeps track of fastest time
-      timemodetoggle = timemodeon game
       
   handleKeys (EventKey (Char 'r') _ _ _) game@ Game { gameState = Winner } =  game { gameState = Title
     , ballLoc = (-100, -100)
@@ -128,13 +118,8 @@ module EventHandler where
     , paused  = True
     , score = 0
     , time = 0
-    , timemodeon = timemodetoggle
     , victorytime = 0
-    , fastesttime = fastest
   }
-    where
-      fastest = fastesttime game --- keeps track of fastest time
-      timemodetoggle = timemodeon game
 
   -- Press P to pause game
   handleKeys (EventKey (Char 'p') Up _ _) game@ Game { gameState = Playing } =
