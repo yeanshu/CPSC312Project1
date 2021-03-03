@@ -53,3 +53,21 @@ main :: IO ()
 main = do
   bg <- loadBMP "bg.bmp"
   playIO window background fps (initialState, bg) renderIO handleKeysAIO updateAIO
+
+{-
+Code from original pong code
+  - most of the GameBoard 
+  - some EventHandler keys
+  - some Rendering
+  - movePaddle, top-bottom wall physics
+  - most of Main
+  - paddleCollision and top-bottom wall collision
+
+New code
+  - added more variables, data to GameBoard (ie. bricks)
+  - more EventHandler keys + rendering
+  - some changes in various files to include new type Archive for adding background image
+  - bricks, brick collisions...
+  - better physics for ball-paddle; ball-brick
+  - time function
+-}
